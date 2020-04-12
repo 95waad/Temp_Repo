@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "524781733125",
+    "firebase_url": "https://waad-1e2a4.firebaseio.com",
+    "project_id": "waad-1e2a4",
+    "storage_bucket": "waad-1e2a4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:524781733125:android:297ce17fbc5fe98789636c",
+        "android_client_info": {
+          "package_name": "com.example.waad"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "524781733125-bs1k71q5mg8kp7lacuk5mlvefic8lj5p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGxJ03kzGWXfUF9fGrb31-vZ83K2OYufQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "524781733125-bs1k71q5mg8kp7lacuk5mlvefic8lj5p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
