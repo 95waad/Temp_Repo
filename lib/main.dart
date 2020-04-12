@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:waad/GUI/home_user.dart';
 import 'package:waad/GUI/home_worker.dart';
 import 'package:waad/GUI/profile_worker.dart';
@@ -19,11 +21,55 @@ import 'users/login.dart';
 import 'dart:async';
 
 
-void main(){
-   runApp(new MaterialApp(
+// void main(){
+//    runApp(new MaterialApp(
 
-    debugShowCheckedModeBanner: false,
-    routes: <String, WidgetBuilder> {
+//     debugShowCheckedModeBanner: false,
+//     routes: <String, WidgetBuilder> {
+
+//       '/signUp': (BuildContext context) => SignUp(),
+//       '/home': (BuildContext context) => Home(),
+//       '/login': (BuildContext context) => Login(),
+//       '/others': (BuildContext context) => Others(),
+//       '/homepage': (BuildContext context) => Home(),
+//       '/services': (BuildContext context) => Service(),
+//       '/addser': (BuildContext context) => AddSer(),
+
+//       // '/side': (BuildContext context) => CollapsingNavigationDrawer(),
+//     },
+//     home: DashboardTest()
+//   ));
+// }
+void main()=>runApp(MyApp());
+
+
+
+class MyApp extends StatelessWidget {
+  Widget _getScreenId() {
+    return StreamBuilder<FirebaseUser>(
+      stream: FirebaseAuth.instance.onAuthStateChanged,
+      builder: (BuildContext context, snapshot) {
+        if (snapshot.hasData) {
+          Provider.of<UserData>(context).currentUserId = snapshot.data.uid;
+          //logged in 
+          return ;//return Your homePage
+        } else {
+          // not logged in 
+          return ;//return LoginPage
+        }
+      },
+    );
+  }
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => UserData(),
+      child: MaterialApp(
+        title: 'Title',
+        home: _getScreenId(),
+        routes: <String, WidgetBuilder> {
 
       '/signUp': (BuildContext context) => SignUp(),
       '/home': (BuildContext context) => Home(),
@@ -35,6 +81,12 @@ void main(){
 
       // '/side': (BuildContext context) => CollapsingNavigationDrawer(),
     },
-    home: DashboardTest()
-  ));
+      ),
+    );
+  }
+}
+
+
+class UserData extends ChangeNotifier {
+  String currentUserId;
 }
