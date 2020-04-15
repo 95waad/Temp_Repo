@@ -1,0 +1,311 @@
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+
+class Test extends StatefulWidget {
+  @override
+  _TestState createState() => _TestState();
+}
+
+class _TestState extends State<Test> {
+
+  File _image;
+  bool _status = true;
+  var selectedType;
+  final databaseReference = Firestore.instance;
+  TextEditingController _titleController;
+
+  Future getImage(BuildContext context) async{
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = image;
+      print('Image Path $_image');
+    });
+  }
+
+  @override
+  void initState() {
+    _titleController = TextEditingController();
+    super.initState();
+  }
+  Future<bool> addDailog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Add Job', style: TextStyle(fontSize: 20.0,
+            fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,),
+            content: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+            /* CircleAvatar(
+                radius: 50.0,  backgroundColor: Colors.deepPurple,
+                child: ClipOval(
+                  child: SizedBox(  height: 180.0, width: 180.0,
+                    child: (_image!=null)?Image.file(_image,fit: BoxFit.fill,)
+                        :Image.asset( 'images/logo1.png',fit: BoxFit.fill), ) )),
+                Padding(padding: EdgeInsets.only(top: 40.0, ),
+                  child: IconButton(
+                    icon: Icon(Icons.camera_alt), iconSize: 30.0,
+                    onPressed: (){ getImage();},
+                  ),
+                ), */
+
+                TextField(
+                  style: TextStyle(fontSize: 16.0, color: Colors.red),
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0)
+                      )
+                  ),
+                ),
+                SizedBox(height: 20.0,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(FontAwesomeIcons.clipboardCheck,
+                    size: 25.0,
+                      color: Color(0xFF29175B),
+                    ),
+                    SizedBox(width: 50.0,),
+                    DropdownButton(
+                      items: _jobType.map((value) => DropdownMenuItem(
+                     child: Text(value,),
+                     value: value,
+                     )).toList(),
+                      onChanged: (selectedJobType){
+                        setState(() {
+                          selectedType = selectedJobType;
+                        });
+                      },
+                      value: selectedType,
+                      hint: Text('Choose Job Type',
+                      style: TextStyle(fontSize: 20.0,
+                      color: Color(0xFF29175B)
+                      ),
+                      ),
+                    )
+
+                  ],
+                ),
+                Switch(
+                  value: _status,
+                  activeColor: Colors.green,
+
+                  onChanged: (bool newValue) {
+                    setState(() {
+                      _status = newValue;
+                    });
+                  },
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              RaisedButton(
+                child: Text('Submit'),
+                onPressed: ()
+                {
+                  Navigator.of(context).pop();
+                  createRecord();
+                  dailogTrigger(context);
+                },
+              ),
+            ],
+          );
+        }
+    );
+  }
+
+  Future<bool> dailogTrigger(BuildContext context) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('job Done', style: TextStyle(fontSize: 15.0),),
+            content: Text('Added'),
+            actions: <Widget>[
+              RaisedButton(
+                child: Text('Alright'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        }
+    );
+  }
+
+  void createRecord() async {
+    DocumentReference ref = await databaseReference.collection("Jobs")
+        .add({
+
+      'title': _titleController.text,
+      'type': selectedType,
+      'isActive': _status,
+      'imageUrl': ,
+
+
+    });
+    print(ref.documentID);
+  }
+
+
+
+  List<String> _jobType = <String>[
+    'Electricity',
+    'Cleaning',
+    'General Maintenance',
+    'Building',
+  ];
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+      gradient: LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment(0.8, 0.0), // 10% of the width, so there are ten blinds.
+      colors: [const Color(0xFF20002c), const Color(0xFFcbb4d4)],
+      )
+      ),
+      child: Scaffold(
+        backgroundColor:Colors.transparent,
+        body: ListView(
+          children: <Widget>[
+            SizedBox(height: 20.0,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                      icon: Icon(Icons.arrow_back_ios),
+                      color: Colors.white,
+                      onPressed: (){
+                        Navigator.of(context).pop();
+
+                      }
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: IconButton(
+                      icon: Icon(Icons.more_horiz),
+                      color: Colors.white ,
+                      onPressed: (){
+                        // Navigator.of(context).push(draw());
+                      }
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20.0,),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                decoration: InputDecoration(
+                    hintText: 'Serarch',
+                    filled: true,
+                    fillColor: Colors.white,
+                    suffixIcon: Icon(Icons.search),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: BorderSide(color: Colors.transparent)
+                    )
+                ),
+              ),
+            ),
+            SizedBox(height: 40.0,),
+            Container(
+               height: MediaQuery.of(context).size.height - 185.0,
+              decoration: BoxDecoration(
+              color: Colors.white,
+               borderRadius: BorderRadius.only(topLeft: Radius.circular(75.0))
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ListJobs(),
+              ),
+          )
+          ],
+        ),
+
+        floatingActionButton: FloatingActionButton(
+            backgroundColor: Color(0xFF29175B) ,
+            child: Icon(Icons.add,
+              size: 30.0,
+              color: Colors.white,),
+            onPressed: (){
+              addDailog(context);
+            }
+        ),
+      ),
+    );
+  }
+}
+
+
+class ListJobs extends StatefulWidget {
+  @override
+  _ListJobsState createState() => _ListJobsState();
+}
+
+class _ListJobsState extends State<ListJobs> {
+  Future getJobs() async{
+    var firestor =Firestore.instance;
+    QuerySnapshot qn = await firestor.collection("Jobs").getDocuments();
+
+    return qn.documents;
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isChecked = true;
+    return Container(
+      child: FutureBuilder(
+        future: getJobs(),
+        builder: ( _ , snapshot){
+        if(snapshot.connectionState == ConnectionState.waiting){
+          return Center(
+            child: Text('Leading'),
+          );
+        }
+        else{
+          return ListView.builder(
+            itemCount: snapshot.data.length,
+              itemBuilder: (_,index){
+              return ListTile(
+                title: Text(snapshot.data[index].data["title"],),
+                subtitle: Text(snapshot.data[index].data["type"]),
+                leading: CircleAvatar(  //Image.file(_image,fit: BoxFit.fill,)
+                 backgroundImage: AssetImage('images/logo1.png')
+                  //AssetImage(snapshot.data[Image.file(_image,fit: BoxFit.fill)]),
+                ),
+                trailing: Icon(Icons.keyboard_arrow_right),
+              );
+            }
+          );
+        }
+      },
+      ),
+    );
+  }
+
+
+}
+
+
+
+
+
